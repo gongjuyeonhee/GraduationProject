@@ -6,7 +6,7 @@ import { BackHandler } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { formatTimeFromTimestamp } from "../utils/timeUtils"; // 이곳에 현재 시간 포맷 함수를 가져온다고 가정
 import { getDatabase, ref, onValue } from "firebase/database";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
 import app from "../firebaseConfig";
 
 export default function WithGo() {
@@ -41,7 +41,7 @@ export default function WithGo() {
       style={styles.postItem}
       onPress={() => {
         // 게시물 선택 시 동작
-        // 예시: navigation.navigate("PostDetail", { postId: item.postId });
+        navigation.navigate("GoPostDetail", { postId: item.postId });
       }}
     >
     <View style = {styles.alignAll}>
@@ -88,10 +88,11 @@ export default function WithGo() {
         onPress={() => handleButtonPress('카풀')}>
       <Text style={styles.buttonText}>카풀</Text>
       </TouchableOpacity>
+
+      
+
     </View>
   );
-
-  
 
   return (
     <View style={styles.container}>
@@ -102,6 +103,12 @@ export default function WithGo() {
          style={styles.flatList}
          ListHeaderComponent={renderHeader}
       />
+
+    <TouchableOpacity              //////////////////////////////////////여기에 아이콘 바꾸시오!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        onPress={() => navigation.navigate("WithChoose",{screen:'WithChoose'})}
+        style={styles.iconContainer}>
+        <Feather name="plus-circle" size={60} color='#146C94' alignSelf="center"/>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -207,5 +214,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#AFD3E2', // 선택된 버튼의 색상을 지정하세요.
     borderColor: '#AFD3E2', // 선택된 버튼의 테두리 색상을 지정하세요.
   },
-  
+  iconContainer: {
+    position: 'absolute', // 아이콘 위치를 조정하기 위해 절대 위치로 설정
+    bottom: 30, // 아이콘을 아래로 조정
+    right: 20, // 아이콘을 오른쪽으로 조정
+    backgroundColor: 'transparent', // 배경을 투명하게 설정
+  },
 });

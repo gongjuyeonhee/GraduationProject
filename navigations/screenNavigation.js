@@ -10,7 +10,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { getDatabase, ref, push, set } from "firebase/database"; // remove, getAuth 등의 불필요한 import 제거
 import app from "../firebaseConfig";
 
-
 import Splash from '../screen/Splash'; //스플래시
 import Home from '../screen/Home'; //메인 홈
 import Detail from '../screen/Details'; //디테일(테스트용)
@@ -24,23 +23,7 @@ import WithChoose from '../mainhome/withChoose'; //pluse button
 import Hi from '../Hi';
 import GoCreatePost from '../chooseGo/GoCreatePost';//[같이가요]게시물 생성 페이지
 import CheckedGoPost from '../chooseGo/CheckedGoPost';
-
-
-//headerTitle: 위의 이름 바꾸기 기능
-
-/* 반복되는 부분 삭제하기!!!!!!!
-const defaultScreenOptions = {
-  headerTintColor: 'white',
-  headerStyle: { backgroundColor: '#146C94', height: 100 },
-};
-
-function StackScreen() {
-  return (
-    <Stack.Navigator initialRouteName="SignIn" screenOptions={defaultScreenOptions}>
-      (여기에 나머지 스크린 설정)
-    </Stack.Navigator>
-     
-*/
+import GoPostDetail from '../chooseGo/GoPostDetail';
 
 const Stack = createStackNavigator();
 
@@ -137,6 +120,8 @@ function StackScreen() {
                     headerTitle: '같이 봐요',
                 }}
             />
+
+            <Stack.Screen name="GoPostDetail" component={GoPostDetail} /*테스트용 화면 */ />
 
             <Stack.Screen name="Detail" component={Detail} /*테스트용 화면 */ />
         </Stack.Navigator>

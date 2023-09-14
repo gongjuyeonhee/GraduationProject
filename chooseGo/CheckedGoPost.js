@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"; // Pressable 제거
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { formatTimeFromTimestamp } from "../utils/timeUtils";
 import { getDatabase, ref, push, set } from "firebase/database"; // remove, getAuth 등의 불필요한 import 제거
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import app from "../firebaseConfig";
@@ -11,9 +12,7 @@ export default function CheckedGoPost() { //이거 이름 수정하기
   const navigation = useNavigation();
   const route = useRoute();
   const { inputData } = route.params; // 전달받은 데이터를 사용
-  console.log(inputData) 
-  //console.log(inputData.userUid)
-
+  
   const [latestPost, setLatestPost] = useState(null);
   const [userUid, setUserUid] = useState(inputData.userUid || "");
   const [driveInfo, setdriveInfo] = useState(inputData.driveInfo || "");
@@ -24,27 +23,10 @@ export default function CheckedGoPost() { //이거 이름 수정하기
   const [selectedDeparture, setSelectedDeparture] = useState(inputData.selectedDeparture || "");//출발장소
   const [selectedDestination, setSelectedDestination] = useState(inputData.selectedDestination || "");//도착장소
 
-  const formatTimeFromTimestamp = (timestamp) => {
-    const dateObj = new Date(timestamp);
-    const hours = dateObj.getHours();
-    const minutes = dateObj.getMinutes();
-    let period = '오전';
-    if (hours >= 12) {
-      period = '오후';
-    }
-    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    const formattedTime = `${period} ${formattedHours}시 ${formattedMinutes}분`;
-    return formattedTime;
-  };
-
-  
-
   const handleNext = async () => {
     const db = getDatabase();
     const postsRef = ref(db, 'posts/withGo');
     const newPostRef = push(postsRef);
-    
     
     const newData = {
       userId: userUid,
@@ -64,7 +46,7 @@ export default function CheckedGoPost() { //이거 이름 수정하기
   await set(newPostRef, newData)
     .then(() => {
       console.log("데이터가 성공적으로 쓰여졌습니다.");
-      navigation.navigate('WithGo');
+      navigation.navigate("WithGo",{screen:'WithGo'});
     })
     .catch(error => {
       console.error("데이터 쓰기 중 오류가 발생했습니다:", error.message);
@@ -73,7 +55,7 @@ export default function CheckedGoPost() { //이거 이름 수정하기
     });
   };
   
-    const handlePrevious = async () => { //이전 버튼을 누를 경우????????????????????????????????????????????????????????????????????????????????????????
+    const handlePrevious = async () => { //이전 버튼을 누를 경우
       navigation.goBack(); // 뒤로 가기 동작 실행
       //navigation.navigate('GoCreatePost');        
     };    
