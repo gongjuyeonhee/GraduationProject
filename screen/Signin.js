@@ -77,7 +77,7 @@ const LoginScreen = () => {
   return (
     <KeyboardAvoidingView style={Styles.pcontainer} behavior="padding">
             <View>
-              <Text style={Styles.topicText}>가/티</Text>
+              <Text style={Styles.topicText}>5gaso</Text>
             </View>         
             <View style={Styles.inputContainer}>
                 <TextInput placeholder="ID" 

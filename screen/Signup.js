@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, View, TextInput, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 import app from "../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
+import {
+  doc,
+  setDoc,
+  getFirestore,
+} from 'firebase/firestore';
+
 
 /* 회원가입을 누르면 발생하는 화면 */
 
@@ -11,17 +17,25 @@ const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState(''); // 닉네임 입력 필드 추가
-  const [profileImage, setProfileImage] = useState(''); // 프로필 사진 입력 필드 추가
+  //const [profileImage, setProfileImage] = useState(''); // 프로필 사진 입력 필드 추가
 
 
   //const navigation = useNavigation();
 
   const handleSignUp = () => {
     const auth = getAuth();
+    const db = getFirestore(app);
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredentials) => {
       const user = userCredentials.user;
       console.log('user created:', user.email);
+
+      // Firebase에 닉네임 저장
+      const userDocRef = doc(db, 'users', user.uid);
+      setDoc(userDocRef, {
+        username, // 닉네임
+      });
+
       navigation.navigate("SignIn",{screen:'SignIn'})
     })
     .catch((error) => {
@@ -29,9 +43,11 @@ const LoginScreen = () => {
     });
   }
 
+
+
   return (
     <KeyboardAvoidingView style={Styles.pcontainer} behavior="padding">
-                  
+                  <Text style={Styles.signupText}>5gaso 회원가입</Text>
             <View style={Styles.inputContainer}>
                 <TextInput placeholder="email"
                  value={email}
@@ -43,6 +59,13 @@ const LoginScreen = () => {
                 style={Styles.input} 
                 secureTextEntry 
                 />
+                <TextInput
+                  placeholder="Username"
+                  value={username}
+                  onChangeText={text => setUsername(text)}
+                  style={Styles.input}
+                />
+                
             </View>
             <View style={Styles.alignItems}>
             
@@ -52,11 +75,12 @@ const LoginScreen = () => {
                   <Text style={Styles.BottomText}>SignUp</Text>
             </TouchableOpacity>
               <View>
-                <Text /*어쩔 수 없었다...각 버튼 사이를 떨어뜨려놓으려면..공백 두번 넣은 상태임*/>  </Text>
+                <Text >  </Text>
               </View>
               
             </View>
     </KeyboardAvoidingView>
+  
   );
 }
 
@@ -118,5 +142,12 @@ const Styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  signupText: {
+    fontSize: 30,
+    color: 'black',
+    textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 40,
   }
 })

@@ -1,14 +1,20 @@
-/* screen에 대한 네비게이션 모음 */
-
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Image, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
-import { getDatabase, ref, push, set } from "firebase/database"; // remove, getAuth 등의 불필요한 import 제거
-import app from "../firebaseConfig";
+import { getAuth, signOut } from "firebase/auth";
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    db,
+  } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Firebase Storage 관련 함수를 import합니다.
+import app from '../firebaseConfig';
 
 import Splash from '../screen/Splash'; //스플래시
 import Home from '../screen/Home'; //메인 홈
@@ -24,6 +30,8 @@ import Hi from '../Hi';
 import GoCreatePost from '../chooseGo/GoCreatePost';//[같이가요]게시물 생성 페이지
 import CheckedGoPost from '../chooseGo/CheckedGoPost';
 import GoPostDetail from '../chooseGo/GoPostDetail';
+import chat from '../chooseGo/chat';
+
 
 const Stack = createStackNavigator();
 
@@ -32,13 +40,13 @@ function StackScreen() {
     return (
         <Stack.Navigator> 
             <Stack.Screen initialRouteName="SignIn" name="SignIn" component={SignIn} options={{headerShown: false}}/>
-            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="SignUp" component={SignUp} options={{headerShown: false}}/>
         
             <Stack.Screen name="Home" component={Home} //메인화면
                 options={{
                 headerTintColor: 'white', 
                 headerStyle: {backgroundColor: '#146C94', height: 100 }, 
-                headerTitle: '가/티', 
+                headerTitle: '5gaso', 
                 headerTintColor: 'beige',
                 headerLeft: null,
                 headerRight: () => (
@@ -75,6 +83,11 @@ function StackScreen() {
                     headerStyle: {backgroundColor: '#146C94', height: 100 },  
                     headerTintColor: 'beige',
                     headerTitle: '같이 가요',
+                    
+                }}
+            />
+
+            {/* 
                     headerRight: () => (
                         <TouchableOpacity onPress={() => navigation.navigate("MyPage", { screen: 'MyPage' })}>
                         <View style={{ marginRight: 20 }}>
@@ -82,8 +95,8 @@ function StackScreen() {
                         </View>
                         </TouchableOpacity>
                         ),
-                }}
-            />
+                        
+                        */}
 
             <Stack.Screen name="WithBuy" component={WithBuy} //같이시켜요 화면
                 options={{
@@ -108,7 +121,7 @@ function StackScreen() {
                     headerTintColor: 'white', 
                     headerStyle: {backgroundColor: '#146C94', height: 100 },  
                     headerTintColor: 'beige',
-                    headerTitle: '같이 ',
+                    headerTitle: '같이 가요',
                 }}
             />
 
@@ -121,7 +134,22 @@ function StackScreen() {
                 }}
             />
 
-            <Stack.Screen name="GoPostDetail" component={GoPostDetail} /*테스트용 화면 */ />
+            <Stack.Screen name="GoPostDetail" component={GoPostDetail} /*테스트용 화면 */ 
+            options={{
+                headerTintColor: 'white', 
+                headerStyle: {backgroundColor: '#146C94', height: 100 },  
+                headerTintColor: 'beige',
+                headerTitle: '같이 가요',
+            }}
+            />
+            <Stack.Screen name="chat" component={chat}
+            options={{
+                headerTintColor: 'white', 
+                headerStyle: {backgroundColor: '#146C94', height: 100 },  
+                headerTintColor: 'beige',
+                headerTitle: '채팅',
+            }}
+            />
 
             <Stack.Screen name="Detail" component={Detail} /*테스트용 화면 */ />
         </Stack.Navigator>

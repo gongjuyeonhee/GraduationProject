@@ -1,7 +1,7 @@
 //같이가요 피드
 
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from "react-native";
 import { BackHandler } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { formatTimeFromTimestamp } from "../utils/timeUtils"; // 이곳에 현재 시간 포맷 함수를 가져온다고 가정
@@ -15,6 +15,8 @@ export default function WithGo() {
   const [scrollY, setScrollY] = useState(0); // 스크롤 Y 위치
   const [isButtonVisible, setIsButtonVisible] = useState(true); // 버튼 표시 여부
   const [selectedButton, setSelectedButton] = useState('all'); // 초기값 'all'
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,7 +36,19 @@ export default function WithGo() {
     fetchData();
   }, []);
 
-  const filteredData = selectedButton === 'all' ? feedData : feedData.filter(item => item.transportation === selectedButton);
+  //const filteredData = selectedButton === 'all' ? feedData : feedData.filter(item => item.transportation === selectedButton);
+
+  const filteredData = selectedButton === 'all'
+  ? feedData
+  : selectedButton === '임박'
+  ? feedData
+      //.filter(item => item.transportation === '카풀')
+      //.sort((a, b) => a.selectedTime - b.selectedTime)
+  : feedData
+      .filter(item => item.transportation === selectedButton)
+      .sort((a, b) => b.createdAt - a.createdAt); // 만들어진 순서대로. 가장 최신에 만들어진건 위에 올라감. 처음 로딩될때랑 비슷함
+
+
 
   const renderPostItem = ({ item }) => (
     <TouchableOpacity
@@ -55,6 +69,7 @@ export default function WithGo() {
       <View style={styles.aligntext}>
         <View style={styles.iconAndText}>
           <Text style={styles.departureText}>{item.departure}</Text>
+          
           <MaterialIcons name="arrow-right-alt" size={20} color="black" />
           <Text style={styles.departureText}>{item.destination}</Text>
         </View>
@@ -65,7 +80,7 @@ export default function WithGo() {
       <View style={styles.separator} />
     </TouchableOpacity>
   );
-
+  
   const handleButtonPress = (buttonType) => { //버튼을 누를 때 상태 변화
     setSelectedButton(buttonType);
   };
@@ -89,8 +104,14 @@ export default function WithGo() {
       <Text style={styles.buttonText}>카풀</Text>
       </TouchableOpacity>
 
-      
-
+      <TouchableOpacity
+        style={[
+          styles.roundedButton,
+          selectedButton === '임박' ? styles.selectedButton : null
+        ]}
+        onPress={() => handleButtonPress('임박')}>
+        <Text style={styles.buttonText}>임박</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -104,15 +125,14 @@ export default function WithGo() {
          ListHeaderComponent={renderHeader}
       />
 
-    <TouchableOpacity              //////////////////////////////////////여기에 아이콘 바꾸시오!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        onPress={() => navigation.navigate("WithChoose",{screen:'WithChoose'})}
+    <TouchableOpacity              
+        onPress={() => navigation.navigate("GoCreatePost",{screen:'GoCreatePost'})}
         style={styles.iconContainer}>
         <Feather name="plus-circle" size={60} color='#146C94' alignSelf="center"/>
       </TouchableOpacity>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -154,6 +174,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginRight: 15, // 택시/카풀 영역과 다음 영역 사이의 간격을 조절
     marginLeft: 8,
+    borderWidth: 2, // 테두리 두께를 조절 (원하는 크기로 수정)
+    borderColor: '#AFD3E2', // 테두리 색상을 조절 (원하는 색상으로 수정)
   },
   TextTransportation: {
     textAlign: "center",
@@ -219,5 +241,20 @@ const styles = StyleSheet.create({
     bottom: 30, // 아이콘을 아래로 조정
     right: 20, // 아이콘을 오른쪽으로 조정
     backgroundColor: 'transparent', // 배경을 투명하게 설정
+  },
+  modalContainer: {
+    flex: 6/7,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // 투명한 배경 색상
+    width: "80%",
+    marginTop: 130,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%", // 모달의 가로 크기를 조절
   },
 });

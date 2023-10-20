@@ -22,8 +22,8 @@ export default function WithChoose() {
     const [userUid, setUserUid] = useState("");
     const [selectedDeparture, setSelectedDeparture] = useState("");
     const [selectedDestination, setSelectedDestination] = useState("");
-    const DeparturesData = ["학교", "충주터미널", "충주역", "신촌"]; // 예시 데이터, 실제 데이터로 대체 필요
-    const DestinationsData = ["학교", "충주터미널", "충주역", "신촌"]; // 예시 데이터, 실제 데이터로 대체 필요
+    const DeparturesData = ["학교", "충주터미널", "충주역", "신촌", "단월", "모시래", "연수동" ]; 
+    const DestinationsData = ["학교", "충주터미널", "충주역", "신촌", "단월", "모시래", "연수동", ]; 
 
 
     useEffect(() => {
@@ -125,7 +125,7 @@ export default function WithChoose() {
         <View style={styles.container}>
             <View style={styles.graycontainer}>
 {/*--2번-- */}
-                <Text style={styles.homeText}>02. 어떻게 갈까요?</Text>
+                <Text style={styles.homeText}>01. 어떻게 갈까요?</Text>
                 <View style={styles.buttonRow}>
                     <RoundedButton
                        title="택시"
@@ -156,7 +156,7 @@ export default function WithChoose() {
                     </View>
                 )}
 {/*--3번-- */}
-                <Text style={styles.homeText}>03. 몇시에 갈까요?</Text>
+                <Text style={styles.homeText}>02. 몇시에 갈까요?</Text>
                 <TouchableOpacity onPress={showDatePicker} style={styles.TimeButton}>
                 <Text style={styles.buttonText}>시간 선택</Text>
                 </TouchableOpacity>
@@ -179,7 +179,7 @@ export default function WithChoose() {
                 </Text>
                 )} 
 {/*--4번-- */}
-                <Text style={styles.homeText}>04. 어디로 갈까요?</Text>
+                <Text style={styles.homeText}>03. 어디로 갈까요?</Text>
                 {/* 어디로 가는 건지에 대해서 드롭다운으로 하려다, 지도로 할려고 했는데.. 일단 한눈에 정보를 보여줘야 하므로 드롭다운으로 하기로 결정함. */}
                 <View style={styles.buttonRow}>
                     <Text style={styles.departureText}>출발 장소</Text>
@@ -315,6 +315,7 @@ export default function WithChoose() {
         textAlign: "center",
         fontWeight: 'bold',
     },
+
     departureText: { //출발,도착 장소의 글자에 대한 스타일
         fontSize: 20,
         color: 'black',
