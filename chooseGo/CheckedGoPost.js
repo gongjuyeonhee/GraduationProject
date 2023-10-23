@@ -1,23 +1,24 @@
 //게시물 생성 페이지에서 만들어진 데이터 확인하는 페이지
 
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"; // Pressable 제거
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native"; 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { formatTimeFromTimestamp } from "../utils/timeUtils";
-import { getDatabase, ref, push, set } from "firebase/database"; // remove, getAuth 등의 불필요한 import 제거
+import { getDatabase, ref, push, set } from "firebase/database"; 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import app from "../firebaseConfig";
 
-export default function CheckedGoPost() { //이거 이름 수정하기
+export default function CheckedGoPost() { 
   const navigation = useNavigation();
   const route = useRoute();
-  const { inputData } = route.params; // 전달받은 데이터를 사용
+  const { inputData } = route.params; //GocreatePost에서 전달받은 데이터를 사용
   
   const [latestPost, setLatestPost] = useState(null);
   const [userUid, setUserUid] = useState(inputData.userUid || "");
   const [driveInfo, setdriveInfo] = useState(inputData.driveInfo || "");
   const [selectedButton, setSelectedButton] = useState(inputData.selectedButton || ""); 
-  const [selectedDate, setSelectedDate] = useState(inputData.selectedDate || "");
+  const [selectedDate, setSelectedDate] = useState(inputData.selectedDate || ""); //출발 시간
+  const [dueDate, setdueDate] = useState(inputData.dueDate || ""); //글 마감 시간
   const [isPassengerChecked, setPassengerChecked] = useState(inputData.isPassengerChecked || false);
   const [isDriverChecked, setDriverChecked] = useState(inputData.isDriverChecked || false);
   const [selectedDeparture, setSelectedDeparture] = useState(inputData.selectedDeparture || "");//출발장소
@@ -33,16 +34,15 @@ export default function CheckedGoPost() { //이거 이름 수정하기
       postId: newPostRef.key,
       transportation: selectedButton, // 수정된 부분: inputData.selectedButton 대신 selectedButton 사용
       selectedTime: selectedDate,
+      selectedDueDate: dueDate,
       departure: selectedDeparture,
       destination: selectedDestination,
       driveInfo: driveInfo,
       createdAt: Date.now(),
-      // ... 나머지 데이터 저장
     };
 
     console.log(newData);
 
-  
   await set(newPostRef, newData)
     .then(() => {
       console.log("데이터가 성공적으로 쓰여졌습니다.");
@@ -51,12 +51,11 @@ export default function CheckedGoPost() { //이거 이름 수정하기
     .catch(error => {
       console.error("데이터 쓰기 중 오류가 발생했습니다:", error.message);
       console.error("오류 스택 트레이스:", error.stack);
-      // 오류를 처리하는 코드 추가
     });
   };
   
     const handlePrevious = async () => { //이전 버튼을 누를 경우
-      navigation.goBack(); // 뒤로 가기 동작 실행
+      navigation.goBack(); // 뒤로 가기 동작 실행 (뒤로 가기 == GocreatePost 페이지 이동)
       //navigation.navigate('GoCreatePost');        
     };    
   
@@ -64,8 +63,7 @@ export default function CheckedGoPost() { //이거 이름 수정하기
       <View style={styles.container}>
         <View style={styles.graycontainer}>
           <Text style={styles.homeText}>아래와 같은 정보가 맞나요?</Text>
-          
-          {/* 가져온 데이터 나타내기*/}
+    
           {inputData && (
             <View>
               <Text style={styles.dataText}>{inputData.selectedButton}로 가요. </Text>
@@ -77,16 +75,15 @@ export default function CheckedGoPost() { //이거 이름 수정하기
               )}
               <View style={styles.separator}/>
               <Text style={styles.dataText}>{formatTimeFromTimestamp(inputData.selectedDate)}에 출발해요.</Text>
+              <Text style={styles.dataText}>{formatTimeFromTimestamp(inputData.dueDate)}까지 모집할거에요.</Text>
               <View style={styles.separator}/>
               <Text style={styles.dataText}>{inputData.selectedDeparture}에서 출발해요.</Text>
               <View style={styles.separator}/>
               <Text style={styles.dataText}>{inputData.selectedDestination}에 같이 가요!</Text>
-              
-              {/* ... 나머지 데이터 필드 출력 */}
             </View>
           )}
   
-          {/* 이전과 등록 버튼 */}
+          {/* -------------------------이전과 등록 버튼------------------------- */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={handlePrevious} style={styles.NextButtom}>
               <Text style={styles.buttonText}>이전</Text>
@@ -98,7 +95,7 @@ export default function CheckedGoPost() { //이거 이름 수정하기
         </View>
       </View>
     );
-              }
+  }
 
 const styles = StyleSheet.create({
   container: {
@@ -113,13 +110,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEEEEE',
     borderRadius: 20,
   },
-  homeText: { //아래와 같은 정보가 맞나요? 부분의 텍스트
+  homeText: { 
     fontSize: 25,
     textAlign: "center",
     fontWeight: 'bold',
     marginTop: "20%",
   },
-  dataText: { //데이터들의 텍스트
+  dataText: { 
     fontSize: 20,
     textAlign: "center",
     fontWeight: 'bold',
@@ -145,7 +142,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
 },
   NextButtom: {
-    //버튼(상자)에 관한 스타일
     backgroundColor: '#F6F1F1',
     padding: 15,
     marginTop: "5%",

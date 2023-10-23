@@ -3,12 +3,7 @@ import { View, Text, StyleSheet, Pressable, TouchableOpacity, Button, Image, Tex
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from "@react-navigation/native";
 import { getAuth, signOut } from "firebase/auth";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-} from 'firebase/firestore';
+import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import app from '../firebaseConfig';
 import { decode } from 'base-64';
@@ -21,8 +16,8 @@ export default function MyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [userNickname, setUserNickname] = useState("");
   const [downloadURL, setDownloadURL] = useState("");
-  const [editingNickname, setEditingNickname] = useState(false); // 닉네임 수정 모드 추가
-  const [newNickname, setNewNickname] = useState(""); // 새로운 닉네임을 저장할 상태 변수 추가
+  const [editingNickname, setEditingNickname] = useState(false); 
+  const [newNickname, setNewNickname] = useState(""); // 새로운 닉네임을 저장할 상태 변수
 
   const db = getFirestore(app);
   const storage = getStorage(app);
@@ -46,13 +41,11 @@ export default function MyPage() {
         }
       }
     };
-
     fetchUserNickname();
   }, []);
 
   useEffect(() => {
     const user = auth.currentUser;
-
     if (user) {
       const userDocRef = doc(db, "users", user.uid);
       getDoc(userDocRef)
@@ -177,8 +170,6 @@ export default function MyPage() {
           )}
         </View>
 
-        
-
         <Pressable onPress={handleLogout} style={styles.nextButton}>
           <Text style={styles.logoutbuttonText}>로그아웃</Text>
         </Pressable>
@@ -201,29 +192,29 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   alignItems: {
-    flexDirection: 'row', // 버튼을 가로로 정렬하기 위해
+    flexDirection: 'row', 
     alignItems: 'center',
-    left: 40, // 아이콘을 오른쪽으로 조정
+    left: 40, 
     marginTop: 15,
   },
   userNicknameText: {
     fontSize: 20,
     textAlign: "center",
     marginTop: 10,
-    left: 15, // 아이콘을 오른쪽으로 조정
+    left: 15, 
   },
   defaultProfileIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#afafaf", // 원하는 색상으로 변경 가능
+    backgroundColor: "#afafaf", 
     justifyContent: "center",
     alignItems: "center",
   },
   nextButton: {
     backgroundColor: "#146C94",
     padding: 10,
-    marginTop: 500, //이거 수정하고
+    marginTop: 500, 
     width: "50%",
     alignSelf: "center",
     borderRadius: 10,
@@ -266,18 +257,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   alignItemedit: {
-    flexDirection: 'row', // 버튼을 가로로 정렬하기 위해
+    flexDirection: 'row', 
   },
   input: {
     backgroundColor: "#fff",
     height: 35,
     width: 130,
     marginTop: 10,
-    left: 15, // 아이콘을 오른쪽으로 조정
+    left: 15, 
     borderRadius: 5,
     padding: 5,
   },
   icon: {
-    marginRight: 10, // 원하는 간격으로 조절
+    marginRight: 10, 
   },
 });

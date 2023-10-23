@@ -36,17 +36,15 @@ export default function WithGo() {
     fetchData();
   }, []);
 
-  //const filteredData = selectedButton === 'all' ? feedData : feedData.filter(item => item.transportation === selectedButton);
-
   const filteredData = selectedButton === 'all'
   ? feedData
   : selectedButton === '임박'
   ? feedData
-      //.filter(item => item.transportation === '카풀')
-      //.sort((a, b) => a.selectedTime - b.selectedTime)
+      .filter(item => item.selectedDueDate < Date.now()) // 마감 시간이 현재 시간보다 이전인 항목만 선택
+      .sort((a, b) => a.selectedDueDate - b.selectedDueDate) // 마감 시간 오름차순 정렬
   : feedData
       .filter(item => item.transportation === selectedButton)
-      .sort((a, b) => b.createdAt - a.createdAt); // 만들어진 순서대로. 가장 최신에 만들어진건 위에 올라감. 처음 로딩될때랑 비슷함
+      .sort((a, b) => b.createdAt - a.createdAt); // 만들어진 순서대로 정렬
 
 
 
@@ -66,15 +64,27 @@ export default function WithGo() {
         )}
       </View>
 
-      <View style={styles.aligntext}>
-        <View style={styles.iconAndText}>
-          <Text style={styles.departureText}>{item.departure}</Text>
-          
-          <MaterialIcons name="arrow-right-alt" size={20} color="black" />
-          <Text style={styles.departureText}>{item.destination}</Text>
-        </View>
-        <Text style={styles.timeText}>{formatTimeFromTimestamp(item.selectedTime)}</Text>  
+      {/*출발 장소->도착 장소*/}
+      <View style={styles.aligntext}> 
+      <View style={styles.iconAndText}>  
+        <Text style={styles.departureText}>{item.departure}</Text>
+        <MaterialIcons name="arrow-right-alt" size={20} color="black" />
+        <Text style={styles.departureText}>{item.destination}</Text>
       </View>
+
+      {/*출발 시간 정렬*/}
+      <View style={styles.iconAndText}>
+      <MaterialIcons name="schedule" size={15} color="black" />
+        <Text style={styles.departureText}>출발 시간: {formatTimeFromTimestamp(item.selectedTime)}</Text>
+      </View>
+
+      {/*도착 시간 정렬*/}
+      <View style={styles.iconAndText}>
+        <MaterialIcons name="schedule" size={15} color="black" />
+        <Text style={styles.departureText}>마감 시간: {formatTimeFromTimestamp(item.selectedDueDate)}</Text>
+      </View>
+    </View>
+
 
       </View>
       <View style={styles.separator} />
@@ -139,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  homeText: { //<Text style={styles.homeText}>---</Text>
+  homeText: {
     fontSize: 30,
     textAlign: "center",
     marginTop: "10%",
@@ -189,10 +199,10 @@ const styles = StyleSheet.create({
     marginTop: "10%",
   },
   aligntext: {
-    flex: 2/3, // 텍스트를 세로로 가운데 정렬하기 위해
+    //flex: 1/3, // 텍스트를 세로로 가운데 정렬하기 위해
     textAlign: "center",
     //backgroundColor: "#fff",
-    padding: 10,
+    //padding: 1,
   },
   alignAll: {
     flexDirection: 'row', // 버튼을 가로로 정렬하기 위해
@@ -201,8 +211,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // 가로로 정렬
     alignItems: 'center', // 수직 가운데 정렬
   },
+  timeiconAndText: {
+    flexDirection: 'row', // 가로로 정렬
+    alignItems: 'center', // 수직 가운데 정렬
+  },
   departureText: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   timeText: {
@@ -219,7 +233,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: 90,
     height: 50,
-    marginRight: 1, // 버튼 사이 간격을 1 픽셀로 설정했는데 이게 맞냐...
+    marginRight: 1,
   },
   buttonText: {
     fontSize: 20,
@@ -233,13 +247,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   selectedButton: {
-    backgroundColor: '#AFD3E2', // 선택된 버튼의 색상을 지정하세요.
-    borderColor: '#AFD3E2', // 선택된 버튼의 테두리 색상을 지정하세요.
-  },
+    backgroundColor: '#AFD3E2', 
+    borderColor: '#AFD3E2',
+  }, 
   iconContainer: {
     position: 'absolute', // 아이콘 위치를 조정하기 위해 절대 위치로 설정
-    bottom: 30, // 아이콘을 아래로 조정
-    right: 20, // 아이콘을 오른쪽으로 조정
+    bottom: 30, 
+    right: 20, 
     backgroundColor: 'transparent', // 배경을 투명하게 설정
   },
   modalContainer: {
@@ -255,6 +269,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "80%", // 모달의 가로 크기를 조절
+    width: "80%", 
   },
 });

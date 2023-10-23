@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from '@expo/vector-icons';
-import { getAuth } from "firebase/auth";
-import {
-  getFirestore,
-  db,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage'; // Firebase Storage 관련 함수를 import합니다.
-import app from '../firebaseConfig';
 
 export default function Home() {
   const navigation = useNavigation();
@@ -23,13 +14,10 @@ export default function Home() {
           <Text style={Btn.BottomText}>같이 가요</Text>
         </View>
       </Pressable>
-
-     
     </View>
   );
 }
 
-// 나머지 스타일 및 컴포넌트 정의는 그대로 사용합니다.
 const Styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -39,7 +27,6 @@ const Styles = StyleSheet.create({
 
 const Btn = StyleSheet.create({
   NextBottom: {
-    //버튼(상자)에 관한 스타일
     backgroundColor: '#F6F1F1',
     padding: 20,
     marginTop: "25%",
@@ -51,7 +38,6 @@ const Btn = StyleSheet.create({
     borderColor: '#AFD3E2'
   },
   BottomText: {
-    //버튼 안의 글자에 관한 스타일
     fontSize: 25,
     color: '#146C94',
     textAlign: "center",
@@ -61,7 +47,6 @@ const Btn = StyleSheet.create({
     marginBottom: 100,
   },
   iconContainer: {
-    //아이콘과 글자 배열에 관한 스타일
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-around',

@@ -16,7 +16,7 @@ import {
   setDoc,
   where,
   getDocs,
-} from 'firebase/firestore'; // Firestore 관련 함수를 import합니다.
+} from 'firebase/firestore'; 
 import app from "../firebaseConfig";
 import { Bubble } from "react-native-gifted-chat";
 import { AntDesign } from '@expo/vector-icons';
@@ -30,20 +30,18 @@ function PostDetailScreen({ route }) {
   const auth = getAuth();
   const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
 
-  // postId를 사용하여 게시물 정보를 가져오고 렌더링합니다.
+  // postId를 사용하여 게시물 정보를 가져오고 렌더링합
   useEffect(() => {
     const fetchData = async () => {
       try {
         const db = getDatabase();
         const postRef = ref(db, `posts/withGo/${postId}`);
       
-        // 게시물 데이터를 실시간으로 가져옵니다.
+        // 게시물 데이터를 실시간으로 가져옴
         const listener = onValue(postRef, (snapshot) => {
           const data = snapshot.val();
           setPostData(data);
           setAuthorUID(data ? data.userId : null); // 작성자 UID 설정
-          //console.log(authorUID);
-          //console.log(currentUserUID);
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -51,9 +49,6 @@ function PostDetailScreen({ route }) {
     };
   
     fetchData(); // fetchData 함수를 호출
-  
-    // 컴포넌트가 언마운트될 때 데이터베이스 리스너를 정리하려고 off함수를 사용하려 했지만, 오류나서 삭제. 잘 돌아감. 굳~
-   
   }, [postId]);
 
   
@@ -97,8 +92,8 @@ function PostDetailScreen({ route }) {
       const snapshot = await get(postRef);
 
       if (snapshot.exists()) {
-        const postId = snapshot.val(); // postId 값을 가져옵니다.
-        createChatRoom(postId); // 가져온 postId를 createChatRoom 함수에 전달합니다.
+        const postId = snapshot.val(); // postId 값 가져오기
+        createChatRoom(postId); // 가져온 postId를 createChatRoom 함수에 전달
       } else {
         console.error('postId가 존재하지 않습니다.');
       }
@@ -151,7 +146,6 @@ function PostDetailScreen({ route }) {
   return (
     <View style={styles.container}>
       <View style={styles.graycontainer}>
-        {/* <Text>게시물 ID: {postId}</Text>*/}
         <Text style={styles.homeText}>같이 가요</Text>
         {/* 게시물 정보를 렌더링하는 나머지 부분 */}
         {postData && (
