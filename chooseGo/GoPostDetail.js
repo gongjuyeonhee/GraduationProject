@@ -16,6 +16,8 @@ import {
   setDoc,
   where,
   getDocs,
+  updateDoc,
+  db,
 } from 'firebase/firestore'; 
 import app from "../firebaseConfig";
 import { Bubble } from "react-native-gifted-chat";
@@ -29,6 +31,25 @@ function PostDetailScreen({ route }) {
   const [authorUID, setAuthorUID] = useState(null); // 작성자 UID 추가
   const auth = getAuth();
   const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
+  const [chatRoomSnapshot, setChatRoomSnapshot] = useState();
+  
+  async function fetchChatRoomData() {
+    try {
+      const db = getFirestore(app); // Firestore 인스턴스 초기화
+      const chatRoomRef = collection(db, 'chatRooms');
+      const chatRoomQuery = query(chatRoomRef, where('postId', '==', postId.toString()));
+      const snapshot = await getDocs(chatRoomQuery);
+      setChatRoomSnapshot(snapshot); // Update chat room data in component's state
+    } catch (error) {
+      console.error('Error fetching chat room data:', error);
+      setChatRoomSnapshot([]); // 오류 발생 시 빈 배열로 초기화
+    }
+  }
+  
+  useEffect(() => {
+    fetchChatRoomData();
+  }, [postId]);
+  
 
   // postId를 사용하여 게시물 정보를 가져오고 렌더링합
   useEffect(() => {
@@ -51,8 +72,9 @@ function PostDetailScreen({ route }) {
     fetchData(); // fetchData 함수를 호출
   }, [postId]);
 
-  
-  const handlePrevious = async () => {
+
+  //삭제 버튼
+  const handleDelete = async () => {
     try {
       const auth = getAuth();
       const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
@@ -102,35 +124,38 @@ function PostDetailScreen({ route }) {
   }
   };
   
-  // 2. 채팅방 생성 함수
+
+  // 채팅방 생성 함수
   const createChatRoom = async (postId) => {
     try {
-      // 게시물의 postId를 사용하여 채팅방 고유 ID 생성
-      const chatRoomId = `post_${postId}_chat`;
-  
-      // Firestore에서 해당 채팅방을 생성하고 연결
+      // Firestore의 chatRooms 컬렉션에 대한 참조
       const db = getFirestore(app);
-
-
       const chatRoomRef = collection(db, 'chatRooms');
-
-      // 방이 이미 존재하는지 확인
+  
+      // 게시물에 대한 채팅 룸이 이미 존재하는지 확인
       const existingChatRoomQuery = query(
         chatRoomRef,
         where('postId', '==', postId.toString())
       );
-
+  
       const existingChatRooms = await getDocs(existingChatRoomQuery);
-
+  
       if (existingChatRooms.docs.length > 0) {
-        // 이미 존재하는 방에 참가
+        // 이미 있는 채팅 룸에 참가자 추가
         const existingChatRoom = existingChatRooms.docs[0];
         const chatRoomId = existingChatRoom.id;
+        const participants = existingChatRoom.data().participants || [];
+        if (!participants.includes(currentUserUID)) {
+          participants.push(currentUserUID);
+          // 참가자 목록을 업데이트
+          await updateDoc(doc(chatRoomRef, chatRoomId), { participants });
+        }
         navigation.navigate('chat', { chatRoomId, postId: postId.toString() });
       } else {
-        // 방이 존재하지 않는 경우, 새로운 방 만들고 참가
+        // 채팅 룸이 존재하지 않는 경우, 새로운 채팅 룸 생성 및 사용자 추가
         const newChatRoom = {
           postId: postId.toString(),
+          participants: [currentUserUID], // 현재 사용자를 첫 번째 참가자로 추가
           createdAt: serverTimestamp(),
         };
         const newChatRoomRef = await addDoc(chatRoomRef, newChatRoom);
@@ -142,7 +167,6 @@ function PostDetailScreen({ route }) {
     }
   };
   
-  
   return (
     <View style={styles.container}>
       <View style={styles.graycontainer}>
@@ -150,21 +174,30 @@ function PostDetailScreen({ route }) {
         {/* 게시물 정보를 렌더링하는 나머지 부분 */}
         {postData && (
           <>
-            <Text style={styles.TextTransportation}>{postData.transportation}로 같이 가요!</Text>
+            <Text style={styles.TextTransportation}>우리 <Text style={styles.TransportationStyle}>{postData.transportation}</Text>
             {postData.transportation === '카풀' && (
-              <Text style={styles.TextDriveInfo}>{postData.driveInfo}</Text>
+              <Text style={styles.TextDriveInfo}>({postData.driveInfo})</Text>
             )}
-            <Text style={styles.departureText}>{postData.departure}에서 출발해요!</Text>
-            <Text style={styles.departureText}>{postData.destination}으로 같이 가요!</Text>
-            <Text style={styles.timeText}>{formatTimeFromTimestamp(postData.selectedTime)}에 출발해요~</Text>
+            {' '}로 같이 가요!</Text>
+            
+            <Text style={styles.departureText}><Text style={styles.TransportationStyle}>{postData.departure}</Text>에서 출발해요!</Text>
+            <Text style={styles.departureText}><Text style={styles.TransportationStyle}>{postData.destination}</Text>으로 같이 가요!</Text>
+            <Text style={styles.timeText}>{formatTimeFromTimestamp(postData.selectedTime)}에 출발해요!</Text>
+            <Text style={styles.participantsText}>
+              참가자 수: {chatRoomSnapshot && chatRoomSnapshot.docs.length > 0 ? chatRoomSnapshot.docs[0].data().participants.length : 0}
+            </Text>
+
+
+
             {currentUserUID === authorUID && (
-              <TouchableOpacity onPress={handlePrevious}>
+              <TouchableOpacity onPress={handleDelete}>
                 <AntDesign name="delete" size={35} color="black" style={{left: 270, marginTop: 50}}/>
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={handleChatButtonClick} style={styles.Gobutton}>
                 <Text style={styles.buttonText}>채팅참가</Text>
               </TouchableOpacity>
+              
           </>
         )}
         {!postData && (
@@ -189,32 +222,33 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   homeText: { //아래와 같은 정보가 맞나요? 부분의 텍스트
-    fontSize: 25,
+    fontSize: 30,
     textAlign: "center",
     fontWeight: 'bold',
     marginTop: 50,
+    color: '#146C94',
   },
   TextTransportation: {
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 25,
     marginTop: "10%",
     fontWeight: 'bold',
   },
   TextDriveInfo: {
     textAlign: "center",
-    fontSize: 10,
+    fontSize: 20,
     marginTop: "10%",
   },
   departureText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 20,
     textAlign: "center",
   },
   timeText: {
-    marginTop: 10, 
+    marginTop: 20, 
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   deletebutton: {
@@ -229,12 +263,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#AFD3E2',
     padding: 15,
-    marginTop: 20,
-    width: 80,
-    left: 130,
+    marginTop: 10,
+    width: 100,
+    left: 120,
     alignItems: 'center',
   },
   buttonText: {
+    textAlign: "center",
+    fontWeight: 'bold',
+  },
+  TransportationStyle: {
+    fontSize: 25,
+    color: '#146C94',
+    fontWeight: 'bold',
+  },
+  participantsText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 30,
     textAlign: "center",
   }
 });
